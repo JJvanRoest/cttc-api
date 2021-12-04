@@ -1,0 +1,11 @@
+{
+    "database": {
+        "host": "192.168.178.172",
+        "port": 5432,
+        "user": "postgres",
+        "password": "6qpDJ_KDkyYKCjt-",
+        "database": "cttc_api",
+        "charset": "utf8"
+    }
+
+}
