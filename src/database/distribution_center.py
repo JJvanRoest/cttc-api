@@ -1,9 +1,10 @@
-from peewee import ForeignKeyField, IntegerField
+from peewee import BigAutoField, ForeignKeyField, IntegerField
 from .database import BaseModel
-from .company import Company
+from .company_details import CompanyDetails
 
 class DistributionCenter(BaseModel):
-    company_id = ForeignKeyField(Company, backref='distribution_centers')
+    id  = BigAutoField()
+    company_id = ForeignKeyField(CompanyDetails, backref='distribution_centers')
     amnt_trucks_waiting = IntegerField(default=0)
     capacity = IntegerField(default=0)
     class Meta:
