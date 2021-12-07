@@ -2,7 +2,8 @@ import logging
 
 from quart import Quart, jsonify
 from quart_cors import cors
-
+from quart_schema import QuartSchema, validate_request, validate_response
+from quart_schema.validation import RequestSchemaValidationError
 from src.api import api_endpoints
 
 from src.database.database import database
@@ -20,13 +21,21 @@ logging.basicConfig(level=logging.getLevelName(LOG_LEVEL))
 
 app = cors(app, expose_headers="Authorization", allow_credentials=True,
            allow_origin=ALLOWED_ORIGINS)
+QuartSchema(app)
 
 
 @app.route('/')
 async def handle():
-    return jsonify({'hello': 'world'})
+    return jsonify({'hello': 'world'}), 200
 
 app.register_blueprint(api_endpoints, url_prefix='/api')
+
+
+# noinspection PyUnusedLocal
+@app.errorhandler(RequestSchemaValidationError)
+async def handle_validation_error(error):
+    return {"errors": error.validation_error.json()}, 400
+
 
 # noinspection PyUnusedLocal
 @app.errorhandler(400)
@@ -89,4 +98,4 @@ def _db_close(exc):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

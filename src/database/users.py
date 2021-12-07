@@ -2,7 +2,8 @@ from peewee import BigAutoField, BooleanField, CharField, SQL, DateTimeField, Fo
 from .database import BaseModel
 from .company_details import CompanyDetails
 
-class User(BaseModel):
+
+class Users(BaseModel):
     id = BigAutoField()
     username = CharField(unique=True)
     password = CharField(null=False)
@@ -11,9 +12,10 @@ class User(BaseModel):
 
     email = CharField(unique=True)
     company = ForeignKeyField(CompanyDetails, backref='users')
-    
+
     created_at = DateTimeField(constraints=[SQL('DEFAULT CURRENT_TIMESTAMP')])
-    updated_at = DateTimeField(constraints=[SQL('DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')])
+    updated_at = DateTimeField(constraints=[SQL(
+        'DEFAULT CURRENT_TIMESTAMP')])
 
     class Meta:
         table_name = 'users'
