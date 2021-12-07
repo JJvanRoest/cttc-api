@@ -6,8 +6,9 @@ class User(BaseModel):
     id = BigAutoField()
     username = CharField(unique=True)
     password = CharField(null=False)
-    active=BooleanField(null=False, default=False)
-    
+    password_reset_token = CharField(null=True)
+    active = BooleanField(null=False, default=False)
+
     email = CharField(unique=True)
     company = ForeignKeyField(CompanyDetails, backref='users')
     

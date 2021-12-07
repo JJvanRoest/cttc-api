@@ -110,7 +110,7 @@ dmypy.json
 
 # secret variable file
 secret_config.py
-config.py
+config.json
 
 # idea
 *.idea
