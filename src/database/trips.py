@@ -5,11 +5,11 @@ from .distribution_center import DistributionCenter as DC
 from .truck_company import TruckCompany as TC
 
 
-class Orders(BaseModel):
+class Trips(BaseModel):
     id = BigAutoField()
     amnt_cargo = IntegerField()
-    dist_center = ForeignKeyField(DC, backref='orders')
-    truck_company = ForeignKeyField(TC, backref='orders')
+    dist_center = ForeignKeyField(DC, backref='trips')
+    truck_company = ForeignKeyField(TC, backref='trips')
     end_loc = CharField()
     kms_travelled = IntegerField()
     ready_for_pickup = BooleanField()
@@ -22,4 +22,4 @@ class Orders(BaseModel):
         'DEFAULT CURRENT_TIMESTAMP')])
 
     class Meta:
-        table_name = 'orders'
+        table_name = 'trips'

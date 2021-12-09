@@ -3,7 +3,7 @@ import logging
 from quart import Quart, jsonify
 from quart_cors import cors
 from quart_schema import QuartSchema, validate_request, validate_response
-from quart_schema.validation import RequestSchemaValidationError
+from quart_openapi import Pint, Resource
 from src.api import api_endpoints
 
 from src.database.database import database
@@ -18,7 +18,6 @@ app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_REFRESH_EACH_REQUEST'] = SESSION_REFRESH_EACH_REQUEST
 app.url_map.strict_slashes = False
 logging.basicConfig(level=logging.getLevelName(LOG_LEVEL))
-
 app = cors(app, expose_headers="Authorization", allow_credentials=True,
            allow_origin=ALLOWED_ORIGINS)
 QuartSchema(app)
@@ -28,13 +27,8 @@ QuartSchema(app)
 async def handle():
     return jsonify({'hello': 'world'}), 200
 
-app.register_blueprint(api_endpoints, url_prefix='/api')
 
-
-# noinspection PyUnusedLocal
-@app.errorhandler(RequestSchemaValidationError)
-async def handle_validation_error(error):
-    return {"errors": error.validation_error.json()}, 400
+app.register_blueprint(api_endpoints, url_prefix='')
 
 
 # noinspection PyUnusedLocal
