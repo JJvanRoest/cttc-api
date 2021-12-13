@@ -28,8 +28,8 @@ async def register(data: RegisterRequest):
     if not company_det:
         return jsonify({'message': 'Company not found'}), 404
     user = Users.create(username=username, password=password,
-                        email=email, company=company)
-    return jsonify({'message': 'Hello World'})
+                        email=email, company=company_det)
+    return jsonify({'message': user})
 
 
 @register_endpoint.route('/password_forgot', methods=['POST'])
