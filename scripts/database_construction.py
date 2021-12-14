@@ -32,7 +32,7 @@ if __name__ == "__main__":
         if arg == "--build":
             db.create_tables(models)
         elif arg == "--drop":
-            db.drop_tables(models)
+            db.drop_tables(models, cascade=True)
         else:
             raise InvalidArgumentError(
                 "Incorrect argument sent. Send '--build' to build database tables or '--drop' to drop all tables.")

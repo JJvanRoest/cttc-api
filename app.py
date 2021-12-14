@@ -4,7 +4,7 @@ from quart import Quart, jsonify
 from quart_cors import cors
 from quart_schema import QuartSchema, validate_request, validate_response
 from quart_openapi import Pint, Resource
-from src.api import api_endpoints
+from src.endpoints.endpoints import endpoints
 
 from src.database.database import database
 
@@ -28,7 +28,7 @@ async def handle():
     return jsonify({'hello': 'world'}), 200
 
 
-app.register_blueprint(api_endpoints, url_prefix='')
+app.register_blueprint(endpoints, url_prefix='')
 
 
 # noinspection PyUnusedLocal

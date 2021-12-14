@@ -3,7 +3,7 @@ from quart import jsonify, request
 from quart.blueprints import Blueprint
 from quart_schema import validate_request
 from dataclasses import dataclass
-from ..database.company_details import CompanyDetails
+from ...database.company_details import CompanyDetails
 
 company_endpoint = Blueprint('companies', __name__)
 

@@ -1,1 +1,1 @@
-from .auth import auth_endpoints
+from .web import web_endpoints
