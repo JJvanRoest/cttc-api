@@ -52,6 +52,7 @@ RUN mkdir -p /var/cache/apk \
     bsd-compat-headers \
     tzdata \
     cargo \
+    postgresql-dev \
     && cp /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone \
     && pip install wheel \
