@@ -21,7 +21,9 @@ RUN apk add --update --no-cache python3 libuuid \
     libpng \
     libstdc++ \
     openssl \
-    musl && \
+    musl \
+    postgresql-dev \ 
+    postgresql-client && \
     find / -type d -name __pycache__ -exec rm -r {} +   && \
     rm -r /usr/lib/python*/ensurepip                    && \
     rm -r /usr/lib/python*/lib2to3                      && \
