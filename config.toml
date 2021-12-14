@@ -1,0 +1,7 @@
+bind = "0.0.0.0:8000"
+accesslog = '-'
+errorlog = '-'
+pid_path = "/tmp/project-master.pid"
+keep_alive_timeout = 30
+workers = 4
+backlog = 128
