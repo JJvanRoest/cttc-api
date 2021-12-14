@@ -11,7 +11,7 @@ from src.database.database import database
 ALLOWED_ORIGINS = ["http://127.0.0.1:5000",
                    "http://127.0.0.1:8080",
                    "http://localhost:8080",
-                   "cttc-api.9t9.tech", "cttc.9t9.tech"]
+                   "https://cttc-api.9t9.tech", "https://cttc.9t9.tech"]
 SESSION_REFRESH_EACH_REQUEST = True
 LOG_LEVEL = "INFO"
 
