@@ -1,3 +1,4 @@
+from datetime import datetime
 from peewee import BigAutoField, CharField, TextField, DateTimeField, SQL
 from .database import BaseModel
 
@@ -14,9 +15,8 @@ class Company(BaseModel):
 
     api_key = CharField(null=False, unique=True)
 
-    created_at = DateTimeField(constraints=[SQL('DEFAULT CURRENT_TIMESTAMP')])
-    updated_at = DateTimeField(constraints=[SQL(
-        'DEFAULT CURRENT_TIMESTAMP')])
+    created_at = DateTimeField(default=datetime.now())
+    updated_at = DateTimeField(default=datetime.now())
 
     class Meta:
         table_name = 'company'
