@@ -9,7 +9,7 @@ class Users(BaseModel):
     username = CharField(null=False)
     password = CharField(null=False)
     password_reset_token = CharField(null=True)
-    active = BooleanField(null=False, default=False)
+    active = BooleanField(null=False, default=True)
 
     email = CharField(unique=True)
     company = ForeignKeyField(Company, backref='users')
