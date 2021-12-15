@@ -8,4 +8,4 @@ api_endpoints = Blueprint('api_endpoints', __name__)
 
 api_endpoints.register_blueprint(trips_endpoints, url_prefix='/trip')
 api_endpoints.register_blueprint(trucks_endpoint, url_prefix='/trucks')
-api_endpoints.register_blueprint(company_endpoint, url_prefix='/companies')
+api_endpoints.register_blueprint(company_endpoint, url_prefix='/company')
