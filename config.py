@@ -20,6 +20,14 @@ class _Config:
     def database(self) -> dict:
         return self.get_config("database")
 
+    @property
+    def auth(self) -> dict:
+        return self.get_config("auth")
+
+    @property
+    def app(self) -> dict:
+        return self.get_config("app")
+
     def get_config(self, key: Optional[str]) -> dict:
         if key is None:
             return self._config_dict
@@ -43,5 +51,6 @@ class CustomJSONEncoder(json.JSONEncoder):
         else:
             return list(iterable)
         return json.JSONEncoder.default(self, obj)
+
 
 CONFIG = _Config()

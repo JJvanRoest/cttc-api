@@ -4,25 +4,23 @@ from quart import Quart, jsonify
 from quart_cors import cors
 from quart_schema import QuartSchema, validate_request, validate_response
 from quart_openapi import Pint, Resource
-from src.endpoints.endpoints import endpoints
+from quart_jwt_extended import JWTManager
 
+from src.endpoints.endpoints import endpoints
 from src.database.database import database
 
-ALLOWED_ORIGINS = ["http://127.0.0.1:5000",
-                   "http://127.0.0.1:8080",
-                   "http://localhost:8080",
-                   "https://cttc-api.9t9.tech", "https://cttc.9t9.tech"]
-SESSION_REFRESH_EACH_REQUEST = True
-LOG_LEVEL = "INFO"
+from config import CONFIG
 
 app = Quart(__name__)
 
-app.config['SESSION_COOKIE_SECURE'] = True
-app.config['SESSION_REFRESH_EACH_REQUEST'] = SESSION_REFRESH_EACH_REQUEST
+app.config['SESSION_COOKIE_SECURE'] = CONFIG.app["session_cookie_secure"]
+app.config['SESSION_REFRESH_EACH_REQUEST'] = CONFIG.app["session_refresh_each_request"]
+app.config['JWT_SECRET_KEY'] = CONFIG.auth["jwt_secret_key"]
 app.url_map.strict_slashes = False
-logging.basicConfig(level=logging.getLevelName(LOG_LEVEL))
+logging.basicConfig(level=logging.getLevelName(CONFIG.app["log_level"]))
+jwt = JWTManager(app)
 app = cors(app, expose_headers="Authorization", allow_credentials=True,
-           allow_origin=ALLOWED_ORIGINS)
+           allow_origin=CONFIG.auth["allowed_origins"])
 QuartSchema(app)
 
 
