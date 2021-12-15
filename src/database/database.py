@@ -11,7 +11,7 @@ class ReconnectDatabase(ReconnectMixin, PostgresqlDatabase):
 
 
 logging.info(CONFIG.database)
-database = PostgresqlDatabase(
+database = ReconnectDatabase(
     database=CONFIG.database["database"],
     host=CONFIG.database["host"],
     port=CONFIG.database["port"],

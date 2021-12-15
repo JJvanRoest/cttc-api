@@ -1,15 +1,14 @@
 from peewee import BigAutoField, BooleanField, DateTimeField, ForeignKeyField, IntegerField, CharField, SQL
 
 from .database import BaseModel
-from .distribution_center import DistributionCenter as DC
-from .truck_company import TruckCompany as TC
+from .company import Company
 
 
 class Trips(BaseModel):
     id = BigAutoField()
     amnt_cargo = IntegerField()
-    dist_center = ForeignKeyField(DC, backref='trips')
-    truck_company = ForeignKeyField(TC, backref='trips')
+    dist_center = ForeignKeyField(Company, backref='trips')
+    truck_company = ForeignKeyField(Company, backref='trips')
     end_loc = CharField()
     kms_travelled = IntegerField()
     ready_for_pickup = BooleanField()
