@@ -3,7 +3,6 @@ from quart import Blueprint, request, jsonify
 from dataclasses import dataclass
 from quart_schema import validate_request
 from playhouse.shortcuts import model_to_dict
-from quart_jwt_extended import create_access_token
 
 from src.database.users import Users
 from src.database.database import database as db
@@ -47,6 +46,10 @@ async def login(data: LoginRequest):
     user_dict = get_clean_user(user)
     token = f"Bearer {create_access_token(identity=email)}"
     return jsonify({'message': user_dict, "token": token, 'success': True})
+
+
+def create_access_token(identity: str) -> str:
+    return identity
 
 
 def verify_password(user: Users, plain_pass: str) -> bool:

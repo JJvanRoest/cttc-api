@@ -4,7 +4,6 @@ from quart import Quart, jsonify
 from quart_cors import cors
 from quart_schema import QuartSchema, validate_request, validate_response
 from quart_openapi import Pint, Resource
-from quart_jwt_extended import JWTManager
 
 from src.endpoints.endpoints import endpoints
 from src.database.database import database
@@ -18,7 +17,6 @@ app.config['SESSION_REFRESH_EACH_REQUEST'] = CONFIG.app["session_refresh_each_re
 app.config['JWT_SECRET_KEY'] = CONFIG.auth["jwt_secret_key"]
 app.url_map.strict_slashes = False
 logging.basicConfig(level=logging.getLevelName(CONFIG.app["log_level"]))
-jwt = JWTManager(app)
 app = cors(app, expose_headers="Authorization", allow_credentials=True,
            allow_origin=CONFIG.auth["allowed_origins"])
 QuartSchema(app)
