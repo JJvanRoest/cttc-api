@@ -3,7 +3,8 @@ from typing import Optional
 from quart import request
 from cryptography.fernet import Fernet
 import jwt
-from .auth import helpers as auth_helpers
+from ..helpers.auth import check_auth
+
 
 def require_auth(type: int = 0):
     """
@@ -12,7 +13,7 @@ def require_auth(type: int = 0):
     """
     def wrapper(f):
         def wrapped_f(*args, **kwargs):
-            authenticated = auth_helpers.check_auth(type)
+            authenticated = check_auth(type)
             if not authenticated:
                 return {'error': 'You must be logged in to access this resource.'}, 401
             return f(*args, **kwargs)

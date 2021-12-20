@@ -17,6 +17,7 @@ from pydantic.types import Json
 
 from ..helpers.auth import hash_api_key, verify_api_key, get_random_string
 from ..helpers.validation import validate_request
+from ..helpers.locations import get_gps_coordinates
 
 
 company_endpoint = Blueprint('company', __name__)
@@ -43,7 +44,8 @@ async def companies():
     if request.method == "POST":
         req = await request.get_json()
         validate_request(model=CompanyRegisterSchema, source=req)
-        return create_company(req)
+        res = await create_company(req)
+        return res
     elif request.method == "GET":
         return jsonify(get_companies()), 200
 
@@ -76,14 +78,16 @@ def get_companies() -> List[Dict]:
     return companies
 
 
-def create_company(req: Json) -> Tuple:
+async def create_company(req: Json) -> Tuple:
     api_key_plain = get_random_string()
     hashed_api_key = hash_api_key(api_key_plain)
+    company_gps_location = await get_gps_coordinates(req["company_location"])
     with database.atomic():
         try:
             company = Company.create(
                 company_name=req["company_name"],
                 company_location=req["company_location"],
+                company_gps_location=company_gps_location,
                 company_type=req["company_type"],
                 company_api_url=req["company_api_url"],
                 api_key=hashed_api_key,
