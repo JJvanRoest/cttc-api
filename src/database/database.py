@@ -4,9 +4,10 @@ from playhouse.shortcuts import ReconnectMixin
 import logging
 from config import CONFIG
 from datetime import datetime
+from playhouse.postgres_ext import *
 
 
-class ReconnectDatabase(ReconnectMixin, PostgresqlDatabase):
+class ReconnectDatabase(ReconnectMixin, PostgresqlExtDatabase):
     pass
 
 

@@ -28,6 +28,10 @@ class _Config:
     def app(self) -> dict:
         return self.get_config("app")
 
+    @property
+    def ext_api(self) -> dict:
+        return self.get_config("ext_api")
+
     def get_config(self, key: Optional[str]) -> dict:
         if key is None:
             return self._config_dict

@@ -3,8 +3,18 @@ from pydantic import ValidationError
 from pydantic.types import Json
 from werkzeug.exceptions import BadRequest
 
+from enum import Enum
 
 from typing import Union
+
+
+class ExtendedEnum(Enum):
+    """
+    Adds list conversion to enum names.
+    """
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
 
 
 class RequestSchemaValidationError(BadRequest):
