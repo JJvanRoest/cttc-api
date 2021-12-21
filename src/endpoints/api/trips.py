@@ -77,20 +77,13 @@ async def create_trip(req: Json) -> Tuple[Json, int]:
     pickup_location = req["pickup_location"]
     destination_location = req["destination_location"]
 
-    start_gps_location, destination_gps_location = await asyncio.gather(
-        get_gps_coordinates(start_location),
-        get_gps_coordinates(destination_location)
-    )
+    # Company retrieval and validation
     with db.atomic():
         truck_company = Company.get_or_none(
             Company.company_name == company_name)
         dist_center = Company.get_or_none(
             Company.company_location == pickup_location)
 
-    truck_gps_location = start_gps_location
-    pickup_gps_location: str = dist_center.company_gps_location
-
-    # Company validation
     if truck_company is None:
         return jsonify({"error": "Please register your company before creating trips."}), 400
     if dist_center is None:
@@ -99,6 +92,15 @@ async def create_trip(req: Json) -> Tuple[Json, int]:
     # Check if all payload items are specified in the CargoTypes enum
     if not payload_ok:
         return jsonify({"error": "Invalid payload"}), 400
+
+    # GPS retrieval
+    start_gps_location, destination_gps_location = await asyncio.gather(
+        get_gps_coordinates(start_location),
+        get_gps_coordinates(destination_location)
+    )
+
+    truck_gps_location = start_gps_location
+    pickup_gps_location: str = dist_center.company_gps_location
 
     # Getting route data and parsing it
     try:
