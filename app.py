@@ -7,7 +7,7 @@ from quart_openapi import Pint, Resource
 
 from src.endpoints.endpoints import endpoints
 from src.database.database import database
-from src.mqtt.mqtt import worker
+from src.mqtt.mqtt import Worker
 from config import CONFIG
 
 app = Quart(__name__)
