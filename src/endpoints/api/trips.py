@@ -24,19 +24,19 @@ class CargoTypes(ExtendedEnum):
     """
     Enum for cargo types
     """
-    ALCOHOL = 'Alcohol'
-    BEER = 'Beer'
-    WINE = 'Wine'
-    TOBACCO = 'Tobacco'
-    PETROL = 'Petrol'
-    DIESEL = 'Diesel'
-    OIL = 'Oil'
-    LPG = 'LPG'
-    JUICE = 'Juice'
-    VEGETABLE_JUICE = 'Vegetable Juice'
-    FRUIT_JUICE = 'Fruit Juice'
-    MINERAL_WATER = 'Mineral Water'
-    UNTAXED = 'Untaxed'
+    ALCOHOL = 'alcohol'
+    BEER = 'beer'
+    WINE = 'wine'
+    TOBACCO = 'tobacco'
+    PETROL = 'petrol'
+    DIESEL = 'diesel'
+    OIL = 'oil'
+    LPG = 'lpg'
+    JUICE = 'juice'
+    VEGETABLE_JUICE = 'vegetable juice'
+    FRUIT_JUICE = 'fruit juice'
+    MINERAL_WATER = 'mineral water'
+    UNTAXED = 'untaxed'
 
 
 class DirectionTypes(ExtendedEnum):
@@ -184,7 +184,7 @@ def verify_payload(payload: List[Dict]) -> bool:
     cargo_types = CargoTypes.list()
     for item in payload:
         try:
-            if not item["cargo_type"] in cargo_types:
+            if not item["cargo_type"].lower() in cargo_types:
                 return False
         except TypeError:
             return False
