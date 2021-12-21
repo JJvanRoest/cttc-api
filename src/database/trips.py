@@ -1,4 +1,4 @@
-from peewee import BigAutoField, BooleanField, DateTimeField, ForeignKeyField, IntegerField, CharField, SQL, BitField
+from peewee import BigAutoField, BooleanField, DateTimeField, ForeignKeyField, IntegerField, CharField, SQL, BitField, FloatField
 from datetime import datetime
 from .database import BaseModel
 from .company import Company
@@ -24,7 +24,8 @@ class Trips(BaseModel):
     dist_center = ForeignKeyField(Company, backref='trips')
     truck_company = ForeignKeyField(Company, backref='trips')
 
-    kms_travelled = IntegerField()
+    meters_traveled = FloatField(default=0.0)
+    total_meters = FloatField(default=1.0)
     ready_for_pickup = BooleanField()
     exp_eta = DateTimeField()
 

@@ -32,6 +32,10 @@ class _Config:
     def ext_api(self) -> dict:
         return self.get_config("ext_api")
 
+    @property
+    def mqtt(self) -> dict:
+        return self.get_config("mqtt")
+
     def get_config(self, key: Optional[str]) -> dict:
         if key is None:
             return self._config_dict

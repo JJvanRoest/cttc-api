@@ -1,10 +1,11 @@
 import asyncio
 from dataclasses import dataclass
-from datetime import datetime, timedelta
-from typing import Dict, List, Tuple
+from datetime import datetime, timedelta, timezone
+from typing import Dict, List, Tuple, Optional
 from uuid import UUID, uuid4
 
 import httpx
+from peewee import Value
 from config import CONFIG
 from playhouse.shortcuts import dict_to_model, model_to_dict
 from pydantic.types import Json
@@ -13,7 +14,7 @@ from quart import Blueprint, jsonify, request
 from ...database.company import Company
 from ...database.database import database as db
 from ...database.trips import Trips
-from ..helpers.locations import get_gps_coordinates
+from ..helpers.locations import get_gps_coordinates, get_route
 from ..helpers.validation import ExtendedEnum, validate_request
 
 trips_endpoints = Blueprint('trips_endpoints', __name__)
@@ -87,17 +88,33 @@ async def create_trip(req: Json) -> Tuple[Json, int]:
             Company.company_location == pickup_location)
 
     truck_gps_location = start_gps_location
-    pickup_gps_location = dist_center.company_gps_location
+    pickup_gps_location: str = dist_center.company_gps_location
 
+    # Company validation
     if truck_company is None:
         return jsonify({"error": "Please register your company before creating trips."}), 400
     if dist_center is None:
         return jsonify({"error": "Pickup location could not be matched to a distribution center."}), 400
 
+    # Check if all payload items are specified in the CargoTypes enum
     if not payload_ok:
         return jsonify({"error": "Invalid payload"}), 400
 
-    exp_eta = datetime.now() + timedelta(hours=1)
+    # Getting route data and parsing it
+    try:
+        route = await get_route([start_gps_location, pickup_gps_location,
+                                 destination_gps_location])
+        route_segments, route_summary = parse_route(route)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    pickup_duration = route_segments[0]["duration"]  # In seconds
+    unloading_time = await get_unloading_time(dist_center)
+    if unloading_time is None:
+        return jsonify({"error": "Distribution Center not available, please try again later"}), 400
+    delay = pickup_duration + unloading_time
+    exp_eta = datetime.now(timezone.utc) + timedelta(seconds=delay)
+    pickup_distance = route_summary["distance"]  # In meters
+
     with db.atomic():
         trip = Trips.create(
             uuid=req["id"],
@@ -112,17 +129,19 @@ async def create_trip(req: Json) -> Tuple[Json, int]:
             truck_gps_location=truck_gps_location,
             current_truck_load=req["current_truck_load"],
             payload=req["payload"],
-
             dist_center=dist_center,
             truck_company=truck_company,
-            kms_travelled=0,
-
+            meters_traveled=0,
+            total_meters=pickup_distance,
             ready_for_pickup=True,
             exp_eta=exp_eta
         )
     trip_dict = model_to_dict(trip)
     del trip_dict["dist_center"]["api_key"]
-    del trip_dict["truck_company"]["api_key"]
+    del trip_dict["dist_center"]["api_key"]
+    del trip_dict["truck_company"]["ext_api_key"]
+    del trip_dict["truck_company"]["ext_api_key"]
+    trip_dict['exp_eta'] = trip_dict['exp_eta'].strftime("%Y-%m-%dT%H:%M:%SZ")
     res = await update_distribution_company(trip)
     if res.status_code == 500 and res.json()["error_reason"] == "NO_SPACE":
         return jsonify({"error_reason": "NO_SPACE"}), 500
@@ -140,12 +159,12 @@ async def update_distribution_company(trip: Trips) -> httpx.Response:
 
     direction = DirectionTypes.INCOMING
     payload = {
-        "date_and_time": trip.exp_eta.isoformat(),
+        "date_and_time": trip.exp_eta.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "direction": direction.value,
         "id": trip.uuid,
         "payload": trip.payload
     }
-    if CONFIG.ext_api["test_mode"] == True:
+    if CONFIG.ext_api["test_mode"] == True or True:
         return httpx.Response(status_code=200, json={"success": "Test mode"})
     async with httpx.AsyncClient() as client:
         res = await client.post(url, json=payload, headers=headers)
@@ -177,3 +196,25 @@ def get_trips() -> Tuple[Json, int]:
         trip_dict: Dict = model_to_dict(trip)
         trips_dict.append(trip_dict)
     return jsonify({"trips": trips_dict}), 200
+
+
+def parse_route(route: Dict) -> Optional[Tuple[Dict]]:
+    route_segments = route["routes"][0]["segments"]
+    if len(route_segments) == 0:
+        raise ValueError("No route found")
+    route_summary = route["routes"][0]["summary"]
+    if route_summary["distance"] == 0:
+        raise ValueError("Route incorrect")
+    return route_segments, route_summary
+
+
+async def get_unloading_time(dist_center: Company) -> Optional[int]:
+    if CONFIG.ext_api["test_mode"] == True or True:
+        res = httpx.Response(status_code=200, json={"unloading_time": 10})
+    else:
+        with httpx.AsyncClient() as client:
+            url = dist_center.company_api_url
+            res = await client.get(f"{url}/company/details")
+    if res.status_code != 200:
+        return None
+    return res.json()["unloading_time"] * 60  # seconds

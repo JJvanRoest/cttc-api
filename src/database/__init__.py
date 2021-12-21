@@ -6,3 +6,4 @@ from .truck_types import *
 from .truck import *
 from .user_roles import *
 from .users import *
+from .locations import *
