@@ -166,7 +166,7 @@ async def update_distribution_company(trip: Trips) -> httpx.Response:
         "id": trip.uuid,
         "payload": trip.payload
     }
-    if CONFIG.ext_api["test_mode"] == True:
+    if CONFIG.ext_api["test_mode"]:
         return httpx.Response(status_code=200, json={"success": "Test mode"})
     async with httpx.AsyncClient() as client:
         res = await client.post(url, json=payload, headers=headers)
@@ -211,7 +211,7 @@ def parse_route(route: Dict) -> Optional[Tuple[Dict]]:
 
 
 async def get_unloading_time(dist_center: Company) -> Optional[int]:
-    if CONFIG.ext_api["test_mode"] == True:
+    if CONFIG.ext_api["test_mode"]:
         res = httpx.Response(status_code=200, json={"unloading_time": 10})
     else:
         with httpx.AsyncClient() as client:

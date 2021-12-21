@@ -14,7 +14,7 @@ async def get_gps_coordinates(location: str) -> Optional[str]:
     :param location: `Street Name House Nr, City, Country`
     :return: `lat, lng`
     """
-    if CONFIG.ext_api["test_mode"] == True:
+    if CONFIG.ext_api["test_mode"]:
         return test_response()
     with db.atomic():
         db_location: Optional[Locations] = Locations.get_or_none(
@@ -40,7 +40,7 @@ async def get_route(coordinates: List[str]) -> Dict:
     :param coordinates: [`lat,long`, `lat,long`]
     :return: route
     """
-    if CONFIG.ext_api["test_mode"] == True:
+    if CONFIG.ext_api["test_mode"]:
         return test_response()
 
     url = "https://api.openrouteservice.org/v2/directions/driving-car/json"
