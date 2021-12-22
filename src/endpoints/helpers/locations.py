@@ -43,7 +43,7 @@ async def get_route(coordinates: List[str]) -> Dict:
     if CONFIG.ext_api["test_mode"]:
         return test_response()
 
-    url = "https://api.openrouteservice.org/v2/directions/driving-car/json"
+    url = "https://api.openrouteservice.org/v2/directions/driving-hgv/json"
     headers = {
         "Authorization": f"{CONFIG.ext_api['ors_token']}",
         "Content-Type": "application/json"

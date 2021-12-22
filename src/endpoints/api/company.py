@@ -47,7 +47,7 @@ async def companies():
         res = await create_company(req)
         return res
     elif request.method == "GET":
-        return jsonify(get_companies()), 200
+        return jsonify({"companies": get_companies(), "success": True}), 200
 
 
 @company_endpoint.route('/<int:company_id>', methods=['GET'])

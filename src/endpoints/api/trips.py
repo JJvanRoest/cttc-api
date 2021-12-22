@@ -214,9 +214,12 @@ async def get_unloading_time(dist_center: Company) -> Optional[int]:
     if CONFIG.ext_api["test_mode"]:
         res = httpx.Response(status_code=200, json={"unloading_time": 10})
     else:
-        with httpx.AsyncClient() as client:
-            url = dist_center.company_api_url
-            res = await client.get(f"{url}/company/details")
+        try:
+            with httpx.AsyncClient() as client:
+                url = dist_center.company_api_url
+                res = await client.get(f"{url}/company/details")
+        except httpx.HTTPError as e:
+            return 1800  # assume half an hour waiting time.
     if res.status_code != 200:
         return None
     return res.json()["unloading_time"] * 60  # seconds
