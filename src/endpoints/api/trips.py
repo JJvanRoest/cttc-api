@@ -80,10 +80,9 @@ async def create_trip(req: Json) -> Tuple[Json, int]:
     # Company retrieval and validation
     with db.atomic():
         truck_company = Company.get_or_none(
-            Company.company_name == company_name)
+            Company.company_name == company_name, Company.company_type == "TC")
         dist_center = Company.get_or_none(
-            Company.company_location == pickup_location)
-
+            Company.company_location == pickup_location, Company.company_type == "DC")
     if truck_company is None:
         return jsonify({"error": "Please register your company before creating trips."}), 400
     if dist_center is None:
@@ -140,15 +139,15 @@ async def create_trip(req: Json) -> Tuple[Json, int]:
         )
     trip_dict = model_to_dict(trip)
     del trip_dict["dist_center"]["api_key"]
-    del trip_dict["dist_center"]["api_key"]
-    del trip_dict["truck_company"]["ext_api_key"]
+    del trip_dict["truck_company"]["api_key"]
+    del trip_dict["dist_center"]["ext_api_key"]
     del trip_dict["truck_company"]["ext_api_key"]
     trip_dict['exp_eta'] = trip_dict['exp_eta'].strftime("%Y-%m-%dT%H:%M:%SZ")
     res = await update_distribution_company(trip)
     if res.status_code == 500 and res.json()["error_reason"] == "NO_SPACE":
         return jsonify({"error_reason": "NO_SPACE"}), 500
     elif res.status_code != 200:
-        return jsonify({"error": "Failed to update distribution center", "error_reason": res.json()["error_reason"]}), 500
+        return jsonify({"error": "Trip created successfully but failed to update distribution center. We will try again later."}), 500
     return jsonify({"success": trip_dict}), 201
 
 
@@ -193,7 +192,7 @@ def verify_payload(payload: List[Dict]) -> bool:
 
 def get_trips() -> Tuple[Json, int]:
     trips_dict: List[Dict] = []
-    trips = Trips.select()
+    trips = Trips.select().order_by(Trips.exp_eta.desc())
     for trip in trips:
         trip_dict: Dict = model_to_dict(trip)
         trips_dict.append(trip_dict)
@@ -212,14 +211,11 @@ def parse_route(route: Dict) -> Optional[Tuple[Dict]]:
 
 async def get_unloading_time(dist_center: Company) -> Optional[int]:
     if CONFIG.ext_api["test_mode"]:
-        res = httpx.Response(status_code=200, json={"unloading_time": 10})
+        res = httpx.Response(status_code=200, json={"unloading_time": 900})
     else:
-        try:
-            async with httpx.AsyncClient() as client:
-                url = dist_center.company_api_url
-                res = await client.get(f"{url}/company/details")
-        except httpx.HTTPError as e:
-            return 1800  # assume half an hour waiting time.
+        async with httpx.AsyncClient() as client:
+            url = dist_center.company_api_url
+            res = await client.get(f"{url}/company/details")
     if res.status_code != 200:
-        return None
+        return 1800
     return res.json()["unloading_time"] * 60  # seconds
