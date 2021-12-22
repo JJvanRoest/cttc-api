@@ -1,0 +1,35 @@
+{
+    "database": {
+        "host": "database-host",
+        "port": 5432,
+        "user": "postgres",
+        "password": "database-password",
+        "database": "cttc_api",
+        "charset": "utf8"
+    },
+    "auth": {
+        "api_key_enabled": false,
+        "jwt_secret_key": "random_string",
+        "allowed_origins": [
+            "http://127.0.0.1:5000",
+            "http://127.0.0.1:8080",
+            "http://localhost:8080"
+        ]
+    },
+    "app": {
+        "session_cookie_secure": true,
+        "session_refresh_each_request": true,
+        "log_level": "info"
+    },
+    "ext_api": {
+        "test_mode": false,
+        "ors_token": "openrouteservice-token",
+        "positionstack_token": "positionstack_token"
+    },
+    "mqtt": {
+        "broker": "mqtt-broker.com",
+        "port": 1883,
+        "topic": "cttc/api/v1/mqtt",
+        "client_id": "cttc-api-mqtt-client"
+    }
+}

@@ -16,8 +16,6 @@ services:
     command: 'app:app -c config.toml'
     links:
       - redis
-    env_file:
-      - .env
     volumes:
       - ./:/usr/src/app
     labels:
@@ -31,6 +29,6 @@ services:
 
 networks:
   web:
-   external: true
+    external: true
   internal:
-   external: false
+    external: false
