@@ -215,7 +215,7 @@ async def get_unloading_time(dist_center: Company) -> Optional[int]:
         res = httpx.Response(status_code=200, json={"unloading_time": 10})
     else:
         try:
-            with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient() as client:
                 url = dist_center.company_api_url
                 res = await client.get(f"{url}/company/details")
         except httpx.HTTPError as e:
